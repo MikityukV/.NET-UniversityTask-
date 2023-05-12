@@ -1,1 +1,2 @@
+# Find and Replace Task ( use file )
 A program for hiding phone numbers. The user selects a certain text file. If the program finds a phone number in it in the format +380xx-xxx-xx-xx, or xxx-xx-xx, or xx-xx-xx, then the program changes three random digits of the number to asterisks * and saves the file under a new name.
