@@ -1,0 +1,161 @@
+Server:
+using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+using System.Collections.Generic;
+
+namespace ExampleTcpListener_Console
+{
+    class ExampleTcpListener
+    {
+        static void Main(string[] args)
+        {
+            TcpListener server = null;
+            try
+            {
+
+                // Устанавливаем порт для TcpListener = 9595.
+                Int32 port = 9595;
+                IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+                int counter = 0;
+                server = new TcpListener(localAddr, port);
+
+                                server.Start();
+
+                // Принимаем клиентов в бесконечном цикле.
+                while (true)
+                {
+                    Console.Write("\nWaiting for a connection... ");
+
+                    .
+                    ThreadPool.QueueUserWorkItem(ObrabotkaZaprosa, server.AcceptTcpClient());
+                    counter++;
+                    Console.Write("\nConnection №" + counter.ToString() + "!");
+                }
+            }
+            catch (SocketException e)
+            {
+                                Console.WriteLine("SocketException: {0}", e);
+            }
+            finally
+            {
+                // Останавливаем TcpListener.
+                server.Stop();
+            }
+
+            Console.WriteLine("\nHit enter to continue...");
+            Console.Read();
+        }
+
+        static void ObrabotkaZaprosa(object client_obj)
+        {
+            // Буфер для принимаемых данных.
+            Byte[] bytes = new Byte[256];
+            String data = null;
+
+            
+            TcpClient client = client_obj as TcpClient;
+
+            data = null;
+
+            // Получаем информацию от клиента
+            NetworkStream stream = client.GetStream();
+
+            int i;
+
+            
+            while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+            {
+
+
+                // Преобразуем данные в ASCII string.
+                data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+
+                string[] number = data.Split(' ');
+
+                List<int> list1 = new List<int>();
+
+                for (int y = 0; y < number.Length; y++)
+                {
+
+                    list1.Add(Convert.ToInt32(number[y]));
+                }
+                list1.Sort();
+
+                string s = String.Join(" ", list1);
+
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(s);
+
+                // Отправляем данные обратно клиенту (ответ).
+                stream.Write(msg, 0, msg.Length);
+
+            }
+
+            // Закрываем соединение.
+            client.Close();
+
+
+        }
+    }
+}
+
+Client:
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+
+namespace ExampleTcpClient
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+                        Console.WriteLine("\n Write number :");
+            string number = Console.ReadLine();
+
+            Connect("127.0.0.1", number );
+            
+            Console.WriteLine("\n Press Enter to continue...");
+            Console.Read();
+        }
+
+        static void Connect(String server, String message)
+        {
+            try
+            {
+                
+                Int32 port = 9595;
+                TcpClient client = new TcpClient(server, port);
+
+                
+                Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+
+                 NetworkStream stream = client.GetStream();
+
+                // Отправляем сообщение нашему серверу. 
+                stream.Write(data, 0, data.Length);
+                Console.WriteLine("Sent: {0}", message);
+                data = new Byte[256];
+
+                // Строка для хранения полученных ASCII данных.
+                String responseData = String.Empty;
+
+                
+                Int32 bytes = stream.Read(data, 0, data.Length);
+                responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
+                Console.WriteLine("Received: {0}", responseData);
+                stream.Close();
+                client.Close();
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine("ArgumentNullException: {0}", e);
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("SocketException: {0}", e);}
