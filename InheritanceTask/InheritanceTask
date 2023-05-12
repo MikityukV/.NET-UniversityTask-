@@ -1,0 +1,61 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace laba2
+{
+    class region
+    {
+        public string Name { get; set; }
+        public float Pop { get; set; }
+        public string[] Cities { get; set; }
+        public region(string name, float pop, string cities)
+
+        {
+            Name = name;
+            Pop = pop; //population
+        }
+      
+        public void Print()
+        {
+            Console.WriteLine("Name: "+ Name);
+            Console.WriteLine("Population: "+ Pop);          
+        }
+        
+    }
+
+    class city : region
+    {
+        private float square;
+        public city(string Name, float square, float Pop, string Cities) :
+            base(Name, Pop, Cities)
+        {
+            this.square = square;
+            Console.WriteLine("City: " + Name + "  " + "Square: " + square);         
+        }
+        
+    }
+    class megapol : city
+    {          
+        public megapol(string Name, float square, float Pop, string Cities):
+           base(Name, square ,Pop, Cities)
+        {
+            Console.WriteLine("\n Method print below \n");
+            Print();
+        }
+    }
+ 
+    
+    class MainClass
+    {
+        static void Main(string[] args)
+        {
+           city Kiev = new city("Kiev", 847.66f, 2.884f, "string cities[] = cities{ }");          
+           megapol Obyx = new megapol("Obyxiv", 24.19f, 342f, " ");                           
+            Console.ReadKey();
+        }
+    }
+}
+
