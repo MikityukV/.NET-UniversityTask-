@@ -1,0 +1,41 @@
+using System;
+using System.IO;
+using System.Net.Http;
+using System.Text.RegularExpressions;
+
+namespace USD
+{
+    class Program
+    {
+        static async System.Threading.Tasks.Task Main(string[] args)
+        {
+            string data = string.Empty;
+            string url = "https://api.privatbank.ua/p24api/pubinfo?exchange&coursid=5";
+            string html = string.Empty;
+
+            //DateTime today = DateTime.Now;
+           // int dayOfMonth = today.Day;
+
+           // url += dayOfMonth;
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            html = await response.Content.ReadAsStringAsync();
+
+            Console.WriteLine("\t Current USD \t\n");
+            Match match = Regex.Match(html, "\"ccy\":\"USD\".*?\"buy\":\"(?<buy>[0-9.]+)\".*?\"sale\":\"(?<sale>[0-9.]+)\"");
+            if (match.Success)
+            {
+                string buy = match.Groups["buy"].Value;
+                string sale = match.Groups["sale"].Value;
+                Console.WriteLine("\tBuy: {0}", buy);
+                Console.WriteLine("\tSale: {0}", sale);
+            }
+            else
+            {
+                Console.WriteLine("Data for USD not found.") ;
+            }
+            Console.ReadLine();
+        }
+    }
+}
