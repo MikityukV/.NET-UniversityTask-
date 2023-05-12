@@ -1,0 +1,73 @@
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+
+
+namespace ConsoleApp2
+{
+    class Program
+    {
+        public class my_form
+        {
+            public string domain { get; set; }
+            public string email { get; set; }
+        }
+
+        public class my_form2
+        {
+            public string domain { get; set; }
+            public int mycount { get; set; }
+            public bool Contain()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Enter variant number [1|2|3...]:");
+            string ttmp = Console.ReadLine();
+            DateTime dt = DateTime.Now;
+            Console.WriteLine("");
+
+            List<my_form> My_email_List = new List<my_form>();
+            const string f = "list_email.txt";
+
+            if (ttmp == "1")
+            {
+                if (File.Exists(f))
+                {
+                    Console.WriteLine("=============================================================");
+                    Console.WriteLine("=================       VARIANT 1      ======================");
+                    Console.WriteLine("=============================================================");
+
+                    using (StreamReader r = new StreamReader(f))
+                    {
+                        string line;
+                        while ((line = r.ReadLine()) != null)
+                        {
+                            My_email_List.Add(new my_form { domain = line.Split('@')[1], email = line });
+                        }
+                    }
+
+                    var domainGroups = (from my_form in My_email_List
+                                        group my_form by my_form.domain into g
+                                        select new { Domain = g.Key, Count = g.Count() }).OrderByDescending(x => x.Count);
+
+                    foreach (var group in domainGroups)
+                    {
+                        Console.WriteLine("-------------------------");
+                        Console.WriteLine("{0} : {1}", group.Domain, group.Count);
+   
+                        foreach (var email in My_email_List.OrderBy(x => x.email))
+                        {
+                            if (group.Domain == email.domain)
+                                Console.WriteLine("Email: " + email.email);
+                        }
+                        Console.WriteLine();
+                        Console.WriteLine("-------------------------");
+                        Console.WriteLine();
+                    }
+                }
+            }
